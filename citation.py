@@ -11,6 +11,8 @@ import pandas as pd
 from datetime import date
 import streamlit as st
 
+article_title = st.text_input('Article Title', '')
+
 st.divider()
 st.write('Contributors')
 
