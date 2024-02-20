@@ -182,7 +182,7 @@ ordered_contributors = authors + [f'"{article_title}"'] + [editors_format] + [tr
 st.button('Add Contributor', on_click=increase_rows)
 
 # Display the ordered contributors
-st.write(f"Contributors: {' '.join(ordered_contributors)}")
+# st.write(f"Contributors: {' '.join(ordered_contributors)}")
 
 # Adding space between the sections
 st.write('\n')
