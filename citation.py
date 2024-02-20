@@ -230,7 +230,7 @@ if date_accessed:
 if annotation:
     ordered_contributors += [f' {annotation}.']
 
-st.write(f"Contributors: {' '.join(ordered_contributors)}")
+# st.write(f"Contributors: {' '.join(ordered_contributors)}")
 
 # Create an empty DataFrame
 df = pd.DataFrame(columns=['Citations Generated'])
@@ -250,8 +250,6 @@ if st.button('Cite'):
 
     # Display the DataFrame with the "Copy" buttons
     st.table(st.session_state.citations_df)
-
-
 
 # Button to clear sources cited
 if st.button('Clear Sources Cited'):
