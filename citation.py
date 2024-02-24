@@ -1,6 +1,6 @@
 # import streamlit as st
 import pandas as pd
-from datetime import date
+from datetime import datetime
 import streamlit as st
 
 PAGE_TITLE = "Luwahs Citation Machine"
@@ -44,8 +44,7 @@ st.markdown("<h1 style='text-align: center;'>MLA9 Citation Machine for Websites<
 
 # adding some spacing
 st.write("\n")
-st.write("<p style='text-align:center;'>Provide as much information as you can to ensure a thorough citation.</p>", unsafe_allow_html=True)
-
+st.markdown("<p style='text-align:center; color:gold;'>Provide as much information as you can to ensure a thorough citation.</p>", unsafe_allow_html=True)
 # App begins here:
 article_title = st.text_input('Article Title', '')
 
@@ -198,33 +197,49 @@ website_URL = st.text_input('URL', '')
 # Add radio buttons to include or remove the url from the list
 include_url = st.radio('Include URL in Contributors', ('Yes', 'No'))
 
-# Dates
-published_date = st.date_input("Published Date")
+# Get the current year
+current_year = datetime.now().year
+
+# Create layout with three columns
+col1, col2, col3 = st.columns(3)
+
+# Day
+day = col1.selectbox("Day:", [f"{i:02d}" for i in range(1, 32)])
+
+# Month
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+month = col2.selectbox("Month:", [m[:3] for m in months])
+
+# Year
+year = col3.number_input("Year:", min_value=1900, max_value=2100, value=current_year)
+
+# Concatenate into published_date
+published_date = f" {day}-{month}-{year},"
 
 # getting today's date as default
-date_accessed = st.date_input("Date Accessed", date.today())
+date_accessed = st.date_input("Date Accessed", datetime.today())
 
 # More Options Expander
 with st.expander("More Options"):
     annotation = st.text_area('Add Annotation', '')
 
 if website_title:
-    ordered_contributors += [f'{website_title}, ']
+    ordered_contributors += [f' {website_title}, ']
     if publisher_sponsor and publisher_sponsor != website_title:
-        ordered_contributors += [f'{publisher_sponsor}, ']
+        ordered_contributors += [f' {publisher_sponsor}, ']
 
 if published_date:
     ordered_contributors += [f' {published_date}']
 
 # Check if URL should be included
 if include_url == 'Yes':
-    ordered_contributors += [f'{website_URL}.']
+    ordered_contributors += [f' {website_URL}.']
 elif include_url == 'No':
     ordered_contributors += [f'']
 
 # look at dates
 if date_accessed:
-    ordered_contributors += [f'{date_accessed}.']
+    ordered_contributors += [f' {date_accessed}.']
     
 # Add annotation if it is not empty
 if annotation:
@@ -232,21 +247,16 @@ if annotation:
 
 # st.write(f"Contributors: {' '.join(ordered_contributors)}")
 
-# Create an empty DataFrame
-df = pd.DataFrame(columns=['Citations Generated'])
-
+# Initialize the DataFrame if it doesn't exist
+if 'citations_df' not in st.session_state:
+    st.session_state.citations_df = pd.DataFrame(columns=['Citations Generated'])
 
 # Button to add final ordered contributor to the DataFrame
 if st.button('Cite'):
-    # Initialize the DataFrame if it doesn't exist
-    if 'citations_df' not in st.session_state:
-        st.session_state.citations_df = pd.DataFrame(columns=['Citations Generated'])
-
     # Append the final ordered contributor to the DataFrame
     new_row = pd.DataFrame({'Citations Generated': [''.join(ordered_contributors)]})
     st.session_state.citations_df = pd.concat([st.session_state.citations_df, new_row], ignore_index=True)
     st.toast('Hooray!', icon='🎉')
-
 
     # Display the DataFrame with the "Copy" buttons
     st.table(st.session_state.citations_df)
@@ -254,7 +264,7 @@ if st.button('Cite'):
 # Button to clear sources cited
 if st.button('Clear Sources Cited'):
     # Clear the DataFrame
-    df = pd.DataFrame(columns=['Citations Generated'])
+    st.session_state.citations_df = pd.DataFrame(columns=['Citations Generated'])
 
     # Display the message
     st.warning('Nothing cited yet', icon="⚠️")
