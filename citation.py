@@ -115,7 +115,7 @@ def display_input_row(index):
             # This is necessary to ensure the button is rendered properly
             pass
 
-        return selected_role, first_name, middle_name, last_name
+        return selected_role, first_name, middle_name, last_name, suffix_value
 
 # Display all rows except those marked for deletion
 contributors = [display_input_row(i) for i in range(st.session_state['rows']) if not st.session_state.get(f'delete_row_{i}', False)]
@@ -125,35 +125,35 @@ authors = []
 editors = []
 translators = []
 
-for contributor_role, first_name, middle_name, last_name in contributors:
+for contributor_role, first_name, middle_name, last_name, suffix_value in contributors:
     if contributor_role == "Author":
         author_count += 1
         if first_author and not middle_name:
-            author_format = f"{last_name}, {first_name}"
+            author_format = f"{suffix_value} {last_name}, {first_name}"
             first_author = False
         elif first_author:
-            author_format = f"{last_name}, {first_name} {middle_name}"
+            author_format = f"{suffix_value} {last_name}, {first_name} {middle_name}"
             first_author = False
         else:
-            author_format = f", and {first_name} {middle_name} {last_name}"
+            author_format = f", and {suffix_value} {first_name} {middle_name} {last_name}"
         authors.append(author_format)
     elif contributor_role == "Editor" and not edited_by_shown:
         editor_count += 1
         if not first_editor:
             first_editor = False
         elif first_editor:
-            editor_format = f"Edited by {first_name} {middle_name} {last_name}"
+            editor_format = f"Edited by {suffix_value} {first_name} {middle_name} {last_name}"
             first_editor = False
         else:
-            editor_format = f" and {first_name} {middle_name} {last_name}"
+            editor_format = f" and {suffix_value} {first_name} {middle_name} {last_name}"
         editors.append(editor_format)
     elif contributor_role == "Translator" and not translated_by_shown:
         translator_count += 1
         if first_translator:
-            translator_format = f"Translated by {first_name} {middle_name} {last_name}"
+            translator_format = f"Translated by {suffix_value} {first_name} {middle_name} {last_name}"
             first_translator = False
         else:
-            translator_format = f" and {first_name} {middle_name} {last_name}"
+            translator_format = f" and {suffix_value} {first_name} {middle_name} {last_name}"
         translators.append(translator_format)
 
 # Concatenate the lists in the desired order
@@ -201,24 +201,32 @@ include_url = st.radio('Include URL in Contributors', ('Yes', 'No'))
 # Get the current year
 current_year = datetime.now().year
 
-# Create layout with three columns
-col1, col2, col3 = st.columns(3)
+# Create layout with four columns
+col1, col2, col3, col4 = st.columns(4)
 
-# Day
-day = col1.selectbox("Day:", [f"{i:02d}" for i in range(1, 32)])
+# First Column: Labels for Published Date and Accessed Date
+col1.write("Published Date")
+col1.markdown("---")
+col1.write("Accessed Date")
 
-# Month
+# Second Column: Day
+day_published = col2.selectbox("Day (Published):", [f"{i:02d}" for i in range(1, 32)])
+day_accessed = col2.selectbox("Day (Accessed):", [f"{i:02d}" for i in range(1, 32)])
+
+# Third Column: Month
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-month = col2.selectbox("Month:", [m[:3] for m in months])
+month_published = col3.selectbox("Month (Published):", [m[:3] for m in months])
+month_accessed = col3.selectbox("Month (Accessed):", [m[:3] for m in months])
 
-# Year
-year = col3.number_input("Year:", min_value=1900, max_value=2100, value=current_year)
+# Fourth Column: Year
+year_published = col4.number_input("Year (Published):", min_value=1900, max_value=2100, value=current_year)
+year_accessed = col4.number_input("Year (Accessed):", min_value=1900, max_value=2100, value=current_year)
 
 # Concatenate into published_date
-published_date = f" {day}-{month}-{year},"
+published_date = f" {day_published} {month_published}. {year_published},"
 
-# getting today's date as default
-date_accessed = st.date_input("Date Accessed", datetime.today())
+# Concatenate into date_accessed
+date_accessed = f" Accessed {day_accessed} {month_accessed}. {year_accessed}."
 
 # More Options Expander
 with st.expander("More Options"):
@@ -240,10 +248,10 @@ elif include_url == 'No':
 
 # look at dates
 if date_accessed:
-    ordered_contributors += [f' {date_accessed}.']
+    ordered_contributors += [f' {date_accessed}']
     
 # Add annotation if it is not empty
-if annotation:
+if annotation != '':
     ordered_contributors += [f' {annotation}.']
 
 # st.write(f"Contributors: {' '.join(ordered_contributors)}")
@@ -281,14 +289,17 @@ with st.expander("Sources Cited"):
     
     # Button to clear sources cited
     if st.button('Clear Sources Cited'):
+        
+        # Display the message
+        st.warning('Nothing cited yet', icon="⚠️")
+        
         # Clear the DataFrame
         st.session_state.citations_df = pd.DataFrame(columns=['Citations Generated'])
 
         # Trigger a re-run to update the UI immediately
         st.rerun()
 
-        # Display the message
-        st.warning('Nothing cited yet', icon="⚠️")
+
 
 
     
