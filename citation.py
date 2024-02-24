@@ -2,6 +2,7 @@
 import pandas as pd
 from datetime import datetime
 import streamlit as st
+import pyperclip  # Import the pyperclip library for clipboard functionality
 
 PAGE_TITLE = "Luwahs Citation Machine"
 PAGE_ICON = "📚"
@@ -258,16 +259,38 @@ if st.button('Cite'):
     st.session_state.citations_df = pd.concat([st.session_state.citations_df, new_row], ignore_index=True)
     st.toast('Hooray!', icon='🎉')
 
-    # Display the DataFrame with the "Copy" buttons
-    st.table(st.session_state.citations_df)
+# Create an expander titled 'Sources Cited'
+with st.expander("Sources Cited"):
+    # Display the DataFrame with the "Copy" buttons inside the expander
+    if 'citations_df' in st.session_state:
+        for idx, row in st.session_state.citations_df.iterrows():
+            # Use st.columns to create two columns inside the expander
+            col1, col2 = st.columns([3, 1])
 
-# Button to clear sources cited
-if st.button('Clear Sources Cited'):
-    # Clear the DataFrame
-    st.session_state.citations_df = pd.DataFrame(columns=['Citations Generated'])
+            # Column 1: Display the citation with a horizontal line after each
+            col1.write(row['Citations Generated'])
+            col1.markdown("---")
 
-    # Display the message
-    st.warning('Nothing cited yet', icon="⚠️")
+            # Column 2: Add a "Copy" button for each row
+            copy_button = col2.button(f'Copy', key=f'copy_button_{idx}')
+
+            # Handle copying to clipboard
+            if copy_button:
+                pyperclip.copy(row['Citations Generated'])
+                # st.write(f"Copied: {row['Citations Generated']}")
+    
+    # Button to clear sources cited
+    if st.button('Clear Sources Cited'):
+        # Clear the DataFrame
+        st.session_state.citations_df = pd.DataFrame(columns=['Citations Generated'])
+
+        # Trigger a re-run to update the UI immediately
+        st.rerun()
+
+        # Display the message
+        st.warning('Nothing cited yet', icon="⚠️")
+
+
     
 #----------------------------------------------------------------
 # ---------------------------------------------------------------
