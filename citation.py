@@ -268,7 +268,7 @@ if st.button('Cite'):
     st.toast('Hooray!', icon='🎉')
 
 # Create an expander titled 'Sources Cited'
-with st.expander("Sources Cited"):
+with st.expander("Sources Cited", expanded=True):
     # Display the DataFrame with the "Copy" buttons inside the expander
     if 'citations_df' in st.session_state:
         for idx, row in st.session_state.citations_df.iterrows():
