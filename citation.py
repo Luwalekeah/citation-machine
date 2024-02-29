@@ -142,7 +142,7 @@ for contributor_role, first_name, middle_name, last_name, suffix_value in contri
         if not first_editor:
             first_editor = False
         elif first_editor:
-            editor_format = f"Edited by {suffix_value} {first_name} {middle_name} {last_name}"
+            editor_format = f" Edited by {suffix_value} {first_name} {middle_name} {last_name}"
             first_editor = False
         else:
             editor_format = f" and {suffix_value} {first_name} {middle_name} {last_name}"
@@ -150,7 +150,7 @@ for contributor_role, first_name, middle_name, last_name, suffix_value in contri
     elif contributor_role == "Translator" and not translated_by_shown:
         translator_count += 1
         if first_translator:
-            translator_format = f"Translated by {suffix_value} {first_name} {middle_name} {last_name}"
+            translator_format = f" Translated by {suffix_value} {first_name} {middle_name} {last_name}"
             first_translator = False
         else:
             translator_format = f" and {suffix_value} {first_name} {middle_name} {last_name}"
