@@ -198,29 +198,32 @@ website_URL = st.text_input('URL', '')
 # Add radio buttons to include or remove the url from the list
 include_url = st.radio('Include URL in Contributors', ('Yes', 'No'))
 
-# Get the current year
+# Get the current year and today's date
 current_year = datetime.now().year
+today_date = datetime.now().date()
 
-# Create layout with four columns
-col1, col2, col3, col4 = st.columns(4)
+# Create layout with one row for "Published" and one row for "Accessed," each containing four columns
+published_col1, published_col2, published_col3, published_col4 = st.columns(4)
+accessed_col1, accessed_col2, accessed_col3, accessed_col4 = st.columns(4)
 
-# First Column: Labels for Published Date and Accessed Date
-col1.write("Published Date")
-col1.markdown("---")
-col1.write("Accessed Date")
+# Published Row - First Column: Labels for Published Date
+published_col1.write("Published Date")
+
+# Accessed Row - First Column: Labels for Accessed Date
+accessed_col1.write("Accessed Date")
 
 # Second Column: Day
-day_published = col2.selectbox("Day (Published):", [f"{i:02d}" for i in range(1, 32)])
-day_accessed = col2.selectbox("Day (Accessed):", [f"{i:02d}" for i in range(1, 32)])
+day_published = published_col2.selectbox("Day:", [f"{i:02d}" for i in range(1, 32)], key="published_day")
+day_accessed = accessed_col2.selectbox("Day:", [f"{i:02d}" for i in range(1, 32)], key="accessed_day", index=today_date.day - 1)
 
 # Third Column: Month
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-month_published = col3.selectbox("Month (Published):", [m[:3] for m in months])
-month_accessed = col3.selectbox("Month (Accessed):", [m[:3] for m in months])
+month_published = published_col3.selectbox("Month:", [m[:3] for m in months], key="published_month")
+month_accessed = accessed_col3.selectbox("Month:", [m[:3] for m in months], key="accessed_month", index=today_date.month - 1)
 
 # Fourth Column: Year
-year_published = col4.number_input("Year (Published):", min_value=1900, max_value=2100, value=current_year)
-year_accessed = col4.number_input("Year (Accessed):", min_value=1900, max_value=2100, value=current_year)
+year_published = published_col4.number_input("Year:", min_value=1900, max_value=2100, value=current_year, key="published_year")
+year_accessed = accessed_col4.number_input("Year:", min_value=1900, max_value=2100, value=today_date.year, key="accessed_year")
 
 # Concatenate into published_date
 published_date = f" {day_published} {month_published}. {year_published},"
